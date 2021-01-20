@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
+const conversation = require('./util/conversation');
 const { prefix, token } = require('./cfg.json');
 
 /**
@@ -31,18 +32,18 @@ const handleMessage = async (msg) => {
         const commandName = argv.shift().toLowerCase();
 
         if (!commandName) {
-            return msg.reply('Please provide a command!');
+            return conversation.failure(msg, 'Please provide a command!', false);
         }
 
         if (!client.commands.has(commandName)) {
-            return msg.reply(`I don't know how to do that! (Unrecognized command)`);
+            return conversation.failure(msg, `I don't know how to do that! (Unrecognized command)`, false);
         }
 
         try {
             await client.commands.get(commandName).execute(msg, argv);
         } catch (err) {
             console.error(`Error while handling command '${commandName}'`, err);
-            return msg.reply(`Unable to execute command ):`);
+            return conversation.failure(msg, `Unable to execute command ):`);
         }
     }
 }
