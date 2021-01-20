@@ -1,33 +1,56 @@
 const fs = require('fs');
-const Discord = require("discord.js");
-const { prefix, token } = require("./cfg.json");
+const Discord = require('discord.js');
+const { prefix, token } = require('./cfg.json');
 
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
+/**
+ * @type {Discord.Client & { commands: Discord.Collection }}
+ */
+const client = Object.assign(new Discord.Client(), {
+    commands: new Discord.Collection()
+});
 
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.endsWith('.map.js'));
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
 
 
-client.once("ready", () => {
+client.once('ready', () => {
     console.log("Online.");
 });
 
-client.on("message", msg => {
+/**
+ *
+ * @param {Discord.Message} msg
+ * @returns {Promise<*>}
+ */
+const handleMessage = async (msg) => {
     if (msg.content.startsWith(prefix)) {
         const argv = msg.content.slice(prefix.length).trim().split(' ');
-        const cmd = argv.shift().toLowerCase();
+        const commandName = argv.shift().toLowerCase();
+
+        if (!commandName) {
+            return msg.reply('Please provide a command!');
+        }
+
+        if (!client.commands.has(commandName)) {
+            return msg.reply(`I don't know how to do that! (Unrecognized command)`);
+        }
 
         try {
-            client.commands.get(cmd).execute(msg, argv);
+            await client.commands.get(commandName).execute(msg, argv);
         } catch (err) {
-            console.error(err);
-            msg.channel.send('no');
+            console.error(`Error while handling command '${commandName}'`, err);
+            return msg.reply(`Unable to execute command ):`);
         }
     }
+}
+
+client.on('message', msg => {
+    handleMessage(msg)
+        .catch(err => console.error('Error while handling message:', err))
 });
 
-client.login(token);
+client.login(token)
+    .catch(err => console.error('Could not log into discord:', err));
