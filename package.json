@@ -1,0 +1,26 @@
+{
+  "name": "alonzo-church",
+  "description": "Discord.js bot for the MSU CSE server",
+  "version": "1.0.0",
+  "main": "bot.js",
+  "dependencies": {
+    "async-mutex": "^0.2.6",
+    "discord.js": "^12.3.1"
+  },
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khuldraeseth/alonzo-church.git"
+  },
+  "author": "khuldraeseth",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/khuldraeseth/alonzo-church/issues"
+  },
+  "homepage": "https://github.com/khuldraeseth/alonzo-church#readme",
+  "devDependencies": {
+    "@types/node": "^14.14.22"
+  }
+}
