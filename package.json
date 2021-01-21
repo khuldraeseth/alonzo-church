@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "main": "bot.js",
   "dependencies": {
+    "async-mutex": "^0.2.6",
     "discord.js": "^12.3.1"
   },
-  "devDependencies": {},
   "scripts": {
     "start": "node bot.js"
   },
@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/khuldraeseth/alonzo-church/issues"
   },
-  "homepage": "https://github.com/khuldraeseth/alonzo-church#readme"
+  "homepage": "https://github.com/khuldraeseth/alonzo-church#readme",
+  "devDependencies": {
+    "@types/node": "^14.14.22"
+  }
 }
