@@ -1,15 +1,14 @@
 const Discord = require('discord.js');
 
+const classManagement = require('../api/class-management');
+
 module.exports = {
     name: 'roles',
     description: 'get a list of all available roles',
-    execute(msg, argv) {
-        const myRole = msg.guild.roles.cache.find(x => x.name === "Alonzo Church");
-        const roles = msg.guild.roles.cache
-            .filter(x => !x.managed)
-            .filter(x => x.comparePositionTo(myRole) < 0)
-            .filter(x => x.name !== "@everyone")
-            .map(x => x.name)
+    async execute(msg, argv) {
+        const managedClasses = await classManagement.retrieveManagedClasses();
+
+        const roles = managedClasses.map(managedClass => `${managedClass.department.toUpperCase()} ${managedClass.courseId.toUpperCase()}`)
             .sort()
             .join(" ​ ​ ​ ");
 

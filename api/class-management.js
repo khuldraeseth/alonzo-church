@@ -280,5 +280,6 @@ const updateState = async (guild) => {
     ]);
 };
 
+exports.retrieveManagedClasses = retrieveManagedClasses;
 exports.addManagedClasses = addManagedClasses;
 exports.updateState = updateState;
