@@ -104,19 +104,22 @@ const removeManagedClass = async (...oldClasses) => {
     }
 
     const managedClasses = await retrieveManagedClasses();
-    for (let i = 0; i < managedClasses.length; i++) {
-        for (let j = 0; j < oldClasses.length; j++) {
-            if (shallowEquals(managedClasses[i], oldClasses[j])) {
-                oldClasses.splice(j, 1);
-                managedClasses.splice(i, 1);
+    for (let i = 0; i < oldClasses.length; i++) {
+        for (let j = 0; j < managedClasses.length; j++) {
+            if (shallowEquals(managedClasses[j], oldClasses[i])) {
+                oldClasses.splice(i, 1);
+                managedClasses.splice(j, 1);
 
                 if (oldClasses.length === 0) {
-                    await saveManagedClasses();
-                    return;
+                    // don't need to break out of the outer loop, since length is 0 it will terminate on its own
+                    break;
                 }
             }
         }
     }
+
+    // even if no classes were found, and removed, save
+    await saveManagedClasses();
 };
 
 
