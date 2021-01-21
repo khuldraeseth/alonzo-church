@@ -5,7 +5,7 @@ const classManagement = require('../api/class-management');
 module.exports = {
     name: 'update-classes',
     description: 'Manually updates state of all managed class channels/roles',
-    async execute(msg, argv) {
+    async execute(self, msg, argv) {
         if (!isAdmin(msg.member)) {
             return conversation.failure(msg, 'You do not have permission to run this command.');
         }

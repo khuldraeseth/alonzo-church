@@ -26,7 +26,7 @@ client.once('ready', () => {
  * @param {Discord.Message} msg
  * @returns {Promise<*>}
  */
-const handleMessage = async (msg) => {
+const handleMessage = async (self, msg) => {
     if (msg.content.startsWith(prefix)) {
         const argv = msg.content.slice(prefix.length).trim().split(' ');
         const commandName = argv.shift().toLowerCase();
@@ -40,7 +40,7 @@ const handleMessage = async (msg) => {
         }
 
         try {
-            await client.commands.get(commandName).execute(msg, argv);
+            await client.commands.get(commandName).execute(self, msg, argv);
         } catch (err) {
             console.error(`Error while handling command '${commandName}'`, err);
             return conversation.failure(msg, `Unable to execute command ):`);
@@ -49,7 +49,7 @@ const handleMessage = async (msg) => {
 }
 
 client.on('message', msg => {
-    handleMessage(msg)
+    handleMessage(client, msg)
         .catch(err => console.error('Error while handling message:', err))
 });
 

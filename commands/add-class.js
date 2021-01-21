@@ -8,7 +8,7 @@ const numbersRegex = /^\d+$/;
 module.exports = {
     name: 'add-class',
     description: 'add a new class channel',
-    async execute(msg, argv) {
+    async execute(self, msg, argv) {
         if (!isAdmin(msg.member)) {
             return conversation.failure(msg, 'Sorry, but you do not have permission to run this command.');
         }
