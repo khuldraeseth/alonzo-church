@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 module.exports = {
     name: 'roles',
     description: 'get a list of all available roles',
-    execute(msg, argv) {
+    execute(self, msg, argv) {
         const myRole = msg.guild.roles.cache.find(x => x.name === "Alonzo Church");
         const roles = msg.guild.roles.cache
             .filter(x => !x.managed)
