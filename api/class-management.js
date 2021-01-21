@@ -160,8 +160,8 @@ const compareClasses = (a, b) => {
  */
 const nameToClass = (name, regex) => {
     const [, department, courseId] = name.match(regex);
-    return {department, courseId};
-}
+    return { department, courseId };
+};
 
 /**
  * @template T
@@ -172,20 +172,11 @@ const nameToClass = (name, regex) => {
  */
 // todo: fix this. discord's channel positions are really weird so I don't feel like fixing this RN
 const getTargetPosition = (managedClass, items, regex) => {
-    return undefined;
-
     const availableItems = items.filter(item => regex.test(item.name))
         .sort((a, b) => a.name.localeCompare(b.name));
 
-    let targetPosition;
-    for (let i = 0; i < availableItems.length; i++) {
-        // if (i < availableItems.length - 1) {
-        //     const nextClass = nameToClass(availableItems[i + 1].name, regex);
-        //     console.log('next class is', nextClass);
-        //     if (managedClass.department.localeCompare(nextClass.department) === 1) {
-        //         break;
-        //     }
-        // }
+    let targetPosition = availableItems[0];
+    for (let i = 1; i < availableItems.length; i++) {
         const currentClass = nameToClass(availableItems[i].name, regex);
         if (compareClasses(managedClass, currentClass) === -1) {
             break;
@@ -193,6 +184,19 @@ const getTargetPosition = (managedClass, items, regex) => {
         targetPosition = availableItems[i];
     }
     return targetPosition;
+};
+
+/**
+ *
+ * @param {module:"discord.js".Guild} guild
+ * @returns {Generator<module:"discord.js".GuildChannel>}
+ */
+const getChannelsWithTargetParent = function* (guild) {
+    for (const channel of guild.channels.cache.values()) {
+        if (channel.parent && channel.parent.name === targetChannelParentName) {
+            yield channel;
+        }
+    }
 };
 
 /**
@@ -223,15 +227,12 @@ const createRole = async (guild, managedClass) => {
  */
 const createChannel = async (guild, managedClass) => {
     const targetChannelName = getTargetChannelName(managedClass);
-
-    const availableChannels = [...guild.channels.cache.values()].filter(channel => channel.parent && channel.parent.name === targetChannelParentName);
-    const targetChannel = getTargetPosition(managedClass, availableChannels, channelNameRegex);
-
+    const targetParent = guild.channels.cache.find(channel => channel.name === targetChannelParentName);
     return guild.channels.create(targetChannelName, {
-        parent: targetChannel && targetChannel.parent,
-        position: (targetChannel && targetChannel.calculatedPosition) || undefined,
+        parent: targetParent,
         reason: 'Managed class'
     });
+
 };
 
 const createMissingRoles = async (guild) => {
@@ -243,8 +244,25 @@ const createMissingRoles = async (guild) => {
 
 const createMissingChannels = async (guild) => {
     const missingChannelClasses = await retrieveAllMissingChannels(guild);
+
+    // In order to avoid race conditions with channel creation events, cache all channels before and populate with the
+    // channels we know that we just created.
+    const allTargetChannels = [...getChannelsWithTargetParent(guild)];
+    const createdChannels = [];
+
     for (const managedClass of missingChannelClasses) {
-        await createChannel(guild, managedClass);
+        createdChannels.push(await createChannel(guild, managedClass));
+    }
+
+    allTargetChannels.push(...createdChannels);
+
+    if (allTargetChannels.length) {
+        const expectedChannelOrder = allTargetChannels.sort((a, b) => a.name.localeCompare(b.name));
+        for (let i = 0; i < expectedChannelOrder.length; i++) {
+            if (expectedChannelOrder[i].position !== i) {
+                await expectedChannelOrder[i].setPosition(i);
+            }
+        }
     }
 };
 
