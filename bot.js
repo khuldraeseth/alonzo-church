@@ -1,7 +1,9 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const conversation = require('./util/conversation');
-const { prefix, token } = require('./cfg.json');
+const { prefix } = require('./cfg.json');
+
+require('dotenv').config();
 
 /**
  * @type {Discord.Client & { commands: Discord.Collection }}
@@ -53,5 +55,5 @@ client.on('message', msg => {
         .catch(err => console.error('Error while handling message:', err))
 });
 
-client.login(token)
+client.login(process.env.token)
     .catch(err => console.error('Could not log into discord:', err));
