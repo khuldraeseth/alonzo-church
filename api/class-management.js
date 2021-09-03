@@ -277,5 +277,12 @@ const updateState = async (guild) => {
     ]);
 };
 
+/**
+ * Haskell is used because it's the first language in the list I went down which had highlighting for both the department and course id.
+ */
+const displayLanguage = 'haskell';
+
+exports.retrieveManagedClasses = retrieveManagedClasses;
 exports.addManagedClasses = addManagedClasses;
 exports.updateState = updateState;
+exports.displayLanguage = displayLanguage;
