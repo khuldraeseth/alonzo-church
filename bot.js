@@ -19,7 +19,7 @@ for (const file of commandFiles) {
     }
     const command = require(`./commands/${file}`);
 
-    if (!command || !command.execute) {
+    if (!command || !command.execute || typeof command.execute !== 'function') {
         continue;
     }
 
