@@ -21,6 +21,8 @@ const readStorage = cached(async () => {
         return JSON.parse(fileContents);
     } catch (e) {
         if (e instanceof Error && e.code === 'ENOENT') {
+            console.warn(`Warning: Storage ${storageFileName} file did not exist, creating a new one...`);
+            console.warn('    If this is not your first time running the bot, you will need to restore the old file and restart in order to avoid losing data');
             return {};
         } else {
             // rethrow all other exceptions
