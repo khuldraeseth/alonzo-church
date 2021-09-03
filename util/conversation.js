@@ -31,9 +31,8 @@ const reactOptionalReply = ({ msg, text, emoji, selfDestruct }) => {
     ]);
 };
 
-const success = (msg, reason, selfDestruct = true) => reactOptionalReply({
-    msg, selfDestruct,
-    text: reason,
+const success = (msg, { text, selfDestruct = true } = {}) => reactOptionalReply({
+    msg, selfDestruct, text,
     emoji: '✅'
 });
 

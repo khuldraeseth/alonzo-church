@@ -16,6 +16,9 @@ module.exports = {
             .sort()
             .join(', ');
 
-        await conversation.success(msg, `I know about ${markdown.inlineCode(managedClasses.length)} class(es): \n${markdown.blockCode(allClasses, classManagement.displayLanguage)}`);
+        await conversation.success(msg, {
+            text: `I know about ${markdown.inlineCode(managedClasses.length)} class(es): \n${markdown.blockCode(allClasses, classManagement.displayLanguage)}`,
+            selfDestruct: false
+        });
     }
 }
