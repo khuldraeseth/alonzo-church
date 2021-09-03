@@ -11,9 +11,18 @@ const client = Object.assign(new Discord.Client(), {
 });
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.endsWith('.map.js'));
+
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
+    if (!file.endsWith('.js')) {
+        continue;
+    }
+    const command = require(`./commands/${file}`);
+
+    if (!command || !command.execute) {
+        continue;
+    }
+
+    client.commands.set(command.name, command);
 }
 
 
