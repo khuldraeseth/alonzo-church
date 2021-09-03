@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const conversation = require('./util/conversation');
+const { isAdmin } = require('./util/permissions');
 const { prefix, token } = require('./cfg.json');
 
 /**
@@ -11,9 +12,18 @@ const client = Object.assign(new Discord.Client(), {
 });
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.endsWith('.map.js'));
+
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
+    if (!file.endsWith('.js')) {
+        continue;
+    }
+    const command = require(`./commands/${file}`);
+
+    if (!command || !command.execute || typeof command.execute !== 'function') {
+        continue;
+    }
+
+    client.commands.set(command.name, command);
 }
 
 
@@ -39,8 +49,14 @@ const handleMessage = async (msg) => {
             return conversation.failure(msg, `I don't know how to do that! (Unrecognized command)`, false);
         }
 
+        const command = await client.commands.get(commandName);
+
+        if (command.isAdmin && !isAdmin(msg.member)) {
+            return conversation.failure(msg, 'Sorry, but you do not have permission to run this command.');
+        }
+
         try {
-            await client.commands.get(commandName).execute(msg, argv);
+            await command.execute(msg, argv);
         } catch (err) {
             console.error(`Error while handling command '${commandName}'`, err);
             return conversation.failure(msg, `Unable to execute command ):`);
