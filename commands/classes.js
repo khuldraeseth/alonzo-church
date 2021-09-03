@@ -12,7 +12,7 @@ module.exports = {
             return msg.reply(`I don't know about any classes!`)
         }
 
-        const allClasses = managedClasses.map(managedClass => `${managedClass.department.toUpperCase()} ${managedClass.courseId.toUpperCase()}`)
+        const allClasses = managedClasses.map(classManagement.display)
             .sort()
             .join(', ');
 

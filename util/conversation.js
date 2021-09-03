@@ -14,20 +14,38 @@ const selfDestructingReply = async (msg, text, timeoutInMs = 4000) => {
     const sentMessage = await msg.reply(text);
     await pause(timeoutInMs);
     await sentMessage.delete();
-}
+};
 
-const success = msg => msg.react('✅');
+const reply = (msg, text, selfDestruct = true) => selfDestruct ? selfDestructingReply(msg, text) : msg.reply(text);
 
-const failure = async (msg, reason, selfDestruct = true) => {
-    await msg.react('❌');
-    if (reason) {
-        if (selfDestruct) {
-            return selfDestructingReply(msg, reason);
-        } else {
-            return msg.reply(reason);
-        }
+const reactOptionalReply = ({ msg, text, emoji, selfDestruct }) => {
+    const reactionPromise = msg.react(emoji);
+
+    if (!text) {
+        return reactionPromise;
     }
-}
+
+    return Promise.all([
+        reply(msg, text, selfDestruct),
+        reactionPromise
+    ]);
+};
+
+const success = (msg, reason, selfDestruct = true) => reactOptionalReply({
+    msg, selfDestruct,
+    text: reason,
+    emoji: '✅'
+});
+
+const failure = async (msg, reason, selfDestruct = true) => reactOptionalReply({
+    msg, selfDestruct,
+    text: reason,
+    emoji: '❌'
+});
+
+/// The message timeout for conversations, e.g. to be used in a message collector
+const messageTimeoutInMs = 15 * 1000; // 15 seconds
 
 exports.success = success;
 exports.failure = failure;
+exports.messageTimeoutInMs = messageTimeoutInMs;
