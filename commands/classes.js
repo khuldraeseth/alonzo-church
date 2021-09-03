@@ -9,7 +9,7 @@ module.exports = {
         const managedClasses = await classManagement.retrieveManagedClasses();
 
         if (managedClasses.length === 0) {
-            return msg.reply(`I don't know about any classes!`)
+            return msg.reply(`I don't know about any classes!`);
         }
 
         const allClasses = managedClasses.map(classManagement.display)

@@ -10,7 +10,7 @@ module.exports = {
         const possibleNewManagedClasses = await classManagement.retrievePossibleNewManagedClasses(msg.guild);
 
         if (possibleNewManagedClasses.length === 0) {
-            return msg.reply('Looks like I know about all managed classes!');
+            return conversations.success(msg, { text: 'Looks like I know about all managed classes!' });
         }
 
         const intermediateMessage = await msg.reply(`Looks like there might be ${markdown.inlineCode(possibleNewManagedClasses.length)} managed class(es) that I don't know about:
@@ -29,6 +29,8 @@ Please say "confirm" to create these managed classes.`)
             }
 
             const confirmMessage = collectedMessages.first();
+            await confirmMessage.delete();
+
             if (confirmMessage.content.toLowerCase() !== 'confirm') {
                 return conversations.failure(msg, 'Operation has been cancelled. Please run the command again to restart.');
             }
