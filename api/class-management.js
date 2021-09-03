@@ -29,6 +29,19 @@ const getTargetChannelName = ({ department, courseId }) => `${department.toLower
 const getTargetRoleName = ({ department, courseId }) => `${department.toUpperCase()} ${courseId.toUpperCase()}`;
 
 /**
+ * @param {string} channelName
+ * @returns {ManagedClass}
+ */
+const fromChannelName = (channelName) => {
+    const matchResult = channelName.match(channelNameRegex);
+    if (!matchResult) {
+        throw new RangeError(`Channel name ${channelName} does not look like a class.`);
+    }
+    const [, department, courseId] = matchResult;
+    return { department, courseId };
+};
+
+/**
  * @type {ManagedClass[] | undefined}
  */
 let managedClassesCache;
@@ -141,6 +154,20 @@ const retrieveAllMissingChannels = async (guild) => {
 };
 
 /**
+ * @param {module:"discord.js".Guild} guild
+ * @returns {Promise<ManagedClass[]>}
+ */
+const retrievePossibleNewManagedClasses = async (guild) => {
+    const managedClasses = await retrieveManagedClasses();
+    const expectedManagedChannelNames = new Set(managedClasses.map(getTargetChannelName));
+
+    const allChannelNames = guild.channels.cache.map(channel => channel.name);
+    const possibleClassChannelNames = allChannelNames.filter(channelName => channelNameRegex.test(channelName) && !expectedManagedChannelNames.has(channelName));
+
+    return possibleClassChannelNames.map(fromChannelName);
+};
+
+/**
  *
  * @param {ManagedClass} a
  * @param {ManagedClass} b
@@ -162,6 +189,13 @@ const nameToClass = (name, regex) => {
     const [, department, courseId] = name.match(regex);
     return { department, courseId };
 };
+
+/**
+ * Display for users, e.g. a list of classes in chat. For now this is the exact same as the role name, could change
+ * in the future which is why it's not just a direct alias and why it exists at all.
+ * @param {ManagedClass} managedClass
+ */
+const display = (managedClass) => getTargetRoleName(managedClass);
 
 /**
  * @template T
@@ -277,5 +311,14 @@ const updateState = async (guild) => {
     ]);
 };
 
+/**
+ * Haskell is used because it's the first language in the list I went down which had highlighting for both the department and course id.
+ */
+const displayLanguage = 'haskell';
+
+exports.retrieveManagedClasses = retrieveManagedClasses;
+exports.retrievePossibleNewManagedClasses = retrievePossibleNewManagedClasses;
 exports.addManagedClasses = addManagedClasses;
 exports.updateState = updateState;
+exports.display = display;
+exports.displayLanguage = displayLanguage;
