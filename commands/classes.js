@@ -16,9 +16,6 @@ module.exports = {
             .sort()
             .join(', ');
 
-        await Promise.all([
-            msg.reply(`I know about ${markdown.inlineCode(managedClasses.length)} class(es): \n${markdown.blockCode(allClasses, classManagement.displayLanguage)}`),
-            conversation.success(msg)
-        ]);
+        await conversation.success(msg, `I know about ${markdown.inlineCode(managedClasses.length)} class(es): \n${markdown.blockCode(allClasses, classManagement.displayLanguage)}`);
     }
 }
