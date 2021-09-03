@@ -9,11 +9,30 @@ const { cached } = require('../util/async');
 const storageFileName = 'data.json';
 const storageFilePath = path.resolve(__dirname, '../', storageFileName);
 
+/**
+ * Read storage, retrieving the current value or an empty value if there is no value in storage.
+ * This method does not create a file in storage if one does not already exist.
+ * (if no write was going to take place anyways, this would be an unnecessary operation)
+ * @type {function(): Promise<object>}
+ */
 const readStorage = cached(async () => {
-    const fileContents = await fs.readFile(storageFilePath, 'utf-8');
-    return JSON.parse(fileContents);
+    try {
+        const fileContents = await fs.readFile(storageFilePath, 'utf-8');
+        return JSON.parse(fileContents);
+    } catch (e) {
+        if (e instanceof Error && e.code === 'ENOENT') {
+            return {};
+        } else {
+            // rethrow all other exceptions
+            throw e;
+        }
+    }
 });
 
+/**
+ * Write the current in-memory value of storage into storage. This will also create an empty file if none exists yet.
+ * @returns {Promise<void>}
+ */
 const writeStorage = async () => {
     const storageData = await readStorage();
     const newStorageContents = JSON.stringify(storageData);
