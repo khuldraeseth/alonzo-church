@@ -7,6 +7,8 @@ const conversation = require('./util/conversation');
 const { isAdmin } = require('./util/permissions');
 const { prefix } = require('./cfg.json');
 
+const { ianModule } = require('modules/ian');
+
 /**
  * @type {Discord.Client & { commands: Discord.Collection }}
  */
@@ -71,6 +73,8 @@ client.on('message', msg => {
     handleMessage(client, msg)
         .catch(err => console.error('Error while handling message:', err))
 });
+
+ianModule(client);
 
 client.login(process.env.token)
     .catch(err => console.error('Could not log into discord:', err));
