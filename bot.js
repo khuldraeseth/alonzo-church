@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv/config');
 
 const fs = require('fs');
 const Discord = require('discord.js');
@@ -31,11 +31,11 @@ for (const file of commandFiles) {
 
 
 client.once('ready', () => {
-    console.log("Online.");
+    console.log('Online.');
 });
 
 /**
- *
+ * @param {typeof client} self
  * @param {Discord.Message} msg
  * @returns {Promise<*>}
  */
