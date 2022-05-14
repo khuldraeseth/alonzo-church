@@ -7,12 +7,12 @@ const conversation = require('./util/conversation');
 const { isAdmin } = require('./util/permissions');
 const { prefix } = require('./cfg.json');
 
-const { ianModule } = require('modules/ian');
+const { ianModule } = require('./modules/ian');
 
 /**
  * @type {Discord.Client & { commands: Discord.Collection }}
  */
-const client = Object.assign(new Discord.Client(), {
+const client = Object.assign(new Discord.Client({ ws: { intents: [ 'GUILD_MEMBERS', Discord.Intents.NON_PRIVILEGED ] } }), {
     commands: new Discord.Collection()
 });
 

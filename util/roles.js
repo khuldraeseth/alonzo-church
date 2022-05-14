@@ -23,3 +23,6 @@ const getOrCreateRole = async (guild, createRoleOptions, createReason) => {
 
     return role;
 };
+
+exports.getRoleIfExists = getRoleIfExists;
+exports.getOrCreateRole = getOrCreateRole;
