@@ -104,5 +104,4 @@ dist
 .tern-port
 
 # Config
-cfg.json
 data.json

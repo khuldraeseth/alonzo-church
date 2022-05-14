@@ -1,7 +1,11 @@
+require('dotenv').config();
+
 const fs = require('fs');
 const Discord = require('discord.js');
 const conversation = require('./util/conversation');
-const { prefix, token } = require('./cfg.json');
+
+const { isAdmin } = require('./util/permissions');
+const { prefix } = require('./cfg.json');
 
 /**
  * @type {Discord.Client & { commands: Discord.Collection }}
@@ -11,9 +15,18 @@ const client = Object.assign(new Discord.Client(), {
 });
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && !file.endsWith('.map.js'));
+
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
+    if (!file.endsWith('.js')) {
+        continue;
+    }
+    const command = require(`./commands/${file}`);
+
+    if (!command || !command.execute || typeof command.execute !== 'function') {
+        continue;
+    }
+
+    client.commands.set(command.name, command);
 }
 
 
@@ -26,7 +39,7 @@ client.once('ready', () => {
  * @param {Discord.Message} msg
  * @returns {Promise<*>}
  */
-const handleMessage = async (msg) => {
+const handleMessage = async (self, msg) => {
     if (msg.content.startsWith(prefix)) {
         const argv = msg.content.slice(prefix.length).trim().split(' ');
         const commandName = argv.shift().toLowerCase();
@@ -39,8 +52,14 @@ const handleMessage = async (msg) => {
             return conversation.failure(msg, `I don't know how to do that! (Unrecognized command)`, false);
         }
 
+        const command = await client.commands.get(commandName);
+
+        if (command.isAdmin && !isAdmin(msg.member)) {
+            return conversation.failure(msg, 'Sorry, but you do not have permission to run this command.');
+        }
+
         try {
-            await client.commands.get(commandName).execute(msg, argv);
+            await command.execute(self, msg, argv);
         } catch (err) {
             console.error(`Error while handling command '${commandName}'`, err);
             return conversation.failure(msg, `Unable to execute command ):`);
@@ -49,9 +68,9 @@ const handleMessage = async (msg) => {
 }
 
 client.on('message', msg => {
-    handleMessage(msg)
+    handleMessage(client, msg)
         .catch(err => console.error('Error while handling message:', err))
 });
 
-client.login(token)
+client.login(process.env.token)
     .catch(err => console.error('Could not log into discord:', err));

@@ -4,7 +4,7 @@ const { pause } = require('../util/async');
 module.exports = {
     name: 'add-role',
     description: 'add role to user',
-    async execute(msg, argv) {
+    async execute(self, msg, argv) {
         const roleName = argv.join(' ');
         const role = msg.guild.roles.cache.find(x => x.name.toLowerCase() === roleName.toLowerCase());
 
