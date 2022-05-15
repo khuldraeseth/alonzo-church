@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv/config');
 
 const fs = require('fs');
 const Discord = require('discord.js');
@@ -7,10 +7,12 @@ const conversation = require('./util/conversation');
 const { isAdmin } = require('./util/permissions');
 const { prefix } = require('./cfg.json');
 
+const { ianModule } = require('./modules/ian');
+
 /**
  * @type {Discord.Client & { commands: Discord.Collection }}
  */
-const client = Object.assign(new Discord.Client(), {
+const client = Object.assign(new Discord.Client({ ws: { intents: [ 'GUILD_MEMBERS', Discord.Intents.NON_PRIVILEGED ] } }), {
     commands: new Discord.Collection()
 });
 
@@ -31,11 +33,11 @@ for (const file of commandFiles) {
 
 
 client.once('ready', () => {
-    console.log("Online.");
+    console.log('Online.');
 });
 
 /**
- *
+ * @param {typeof client} self
  * @param {Discord.Message} msg
  * @returns {Promise<*>}
  */
@@ -71,6 +73,8 @@ client.on('message', msg => {
     handleMessage(client, msg)
         .catch(err => console.error('Error while handling message:', err))
 });
+
+ianModule(client);
 
 client.login(process.env.token)
     .catch(err => console.error('Could not log into discord:', err));

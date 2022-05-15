@@ -1,0 +1,1 @@
+exports.getVisibleName = (member) => member.nickname ?? member.user.username;

@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
 
+const classManagement = require('../api/class-management');
+
 module.exports = {
     name: 'roles',
     description: 'get a list of all available roles',
