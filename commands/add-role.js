@@ -11,6 +11,10 @@ module.exports = {
         if (!role) {
             return conversation.failure(msg, `That role doesn't exist!`);
         }
+        
+        if (role.name == "Ian Barber") {
+            return conversation.failure(msg, `I'm sorry, but that's not allowed. You must become one with the Ian Barber.`);
+        }
 
         try {
             await msg.member.roles.add(role);
